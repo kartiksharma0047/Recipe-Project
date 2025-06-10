@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block start %}
+<div class="d-flex justify-content-center align-items-center min-vh-100">
+
+  <!-- Center Form -->
+  <form
+    class="col-10 col-md-6 col-lg-4"
+    method="post"
+    enctype="multipart/form-data"
+  >
+    {% csrf_token %}
+    <h1 style="text-align: center">Update Receipe</h1>
+    <div class="mb-3">
+      <label class="form-label">Recipe Name</label>
+      <input
+        name="receipe_name"
+        type="text"
+        value="{{ recepie.receipe_name }}"
+        class="form-control"
+        placeholder="Enter recipe name"
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Recipe Description</label>
+      <textarea
+        name="receipe_description"
+        class="form-control"
+        placeholder="Describe your recipe"
+      >{{ recepie.receipe_description }}</textarea>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Recipe Image</label>
+      <input name="receipe_image" type="file" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary w-100 mb-2">Update Receipe</button>
+
+    <!-- Cancel Update Button -->
+    <a href="/recepies_list" class="btn btn-secondary w-100">Cancel Update</a>
+  </form>
+</div>
+{% endblock %}

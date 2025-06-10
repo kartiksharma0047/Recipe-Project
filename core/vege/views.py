@@ -26,3 +26,29 @@ def delete_receipe(request, id):
     querySet=Receipe.objects.get(id=id)
     querySet.delete()
     return redirect('/recepies_list')
+
+
+def update_receipe(request, id):
+    querySet = Receipe.objects.get(id=id)
+    context = {'recepie': querySet}
+    
+    if request.method == "POST":
+        data = request.POST
+
+        receipe_name = data.get('receipe_name')
+        receipe_description = data.get('receipe_description')
+        receipe_image = request.FILES.get('receipe_image')
+
+        if receipe_name:  # Only update if not None or empty string
+            querySet.receipe_name = receipe_name
+
+        if receipe_description:
+            querySet.receipe_description = receipe_description
+
+        if receipe_image:
+            querySet.receipe_image = receipe_image
+
+        querySet.save()
+        return redirect('/recepies_list')
+    
+    return render(request,'Pages/update_recepies.html',context=context)        

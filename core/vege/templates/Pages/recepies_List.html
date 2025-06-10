@@ -1,31 +1,31 @@
-{% extends "base.html" %} {% block start %}
-<div
-  class="container min-vh-100 d-flex align-items-center justify-content-center"
->
+{% extends "base.html" %}
+{% block start %}
+<div class="container min-vh-100 d-flex align-items-center justify-content-center">
   <div class="row w-100">
+
     <!-- Left Side Button -->
-    <div
-      class="col-12 col-md-2 mb-3 d-flex align-items-center justify-content-center"
-    >
+    <div class="col-12 col-md-2 mb-3 d-flex align-items-center justify-content-center">
       <a href="/" class="btn btn-outline-light">Add Recipe</a>
     </div>
 
     <!-- Centered Scrollable Table -->
     <div class="col-12 col-md-10">
-      <div
-        class="table-responsive"
-        style="
-          max-height: 500px;
-          overflow-y: auto;
-          background-color: rgba(255, 255, 255, 0.05);
-          padding: 1rem;
-          border-radius: 1rem;
-        "
-      >
+      
+      <!-- Search + Reset -->
+      <div class="mb-3 d-flex gap-2">
+        <input
+          id="searchInput"
+          type="text"
+          class="form-control"
+          placeholder="Search by recipe name"
+        />
+        <button id="searchBtn" class="btn btn-primary">Search</button>
+        <button id="resetBtn" class="btn btn-secondary">Reset</button>
+      </div>
+
+      <div class="table-responsive" style="max-height: 500px; overflow-y: auto; background-color: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 1rem;">
         <h2 class="text-center mb-4">List of Recipes</h2>
-        <table
-          class="table table-hover table-bordered table-dark align-middle text-center"
-        >
+        <table class="table table-hover table-bordered table-dark align-middle text-center" id="recipeTable">
           <thead class="table-light text-dark">
             <tr>
               <th>S No.</th>
@@ -37,27 +37,19 @@
           </thead>
           <tbody>
             {% for recepie in context %}
-            <tr>
-              <td>{{ forloop.counter }}</td>
-              <td>{{ recepie.receipe_name }}</td>
+            <tr data-id="{{ recepie.id }}">
+              <td class="serial-number">{{ forloop.counter }}</td>
+              <td class="recipe-name">{{ recepie.receipe_name }}</td>
               <td>
-                <span class="short-desc"
-                  >{{ recepie.receipe_description|truncatechars:50 }}</span
-                >
-                <span class="full-desc d-none"
-                  >{{ recepie.receipe_description }}</span
-                >
+                <span class="short-desc">{{ recepie.receipe_description|truncatechars:50 }}</span>
+                <span class="full-desc d-none">{{ recepie.receipe_description }}</span>
                 <br />
-                <button
-                  class="btn btn-sm btn-link text-light toggle-desc-btn p-0"
-                >
-                  Show more
-                </button>
+                <button class="btn btn-sm btn-link text-light toggle-desc-btn p-0">Show more</button>
               </td>
               <td>
                 <img
                   src="{{ recepie.receipe_image.url }}"
-                  alt="recepie.receipe_image"
+                  alt="Image"
                   width="100"
                   height="80"
                   style="object-fit: cover; border-radius: 6px"
@@ -65,12 +57,11 @@
               </td>
               <td>
                 <a href="delete-receipe/{{recepie.id}}/" class="btn btn-danger">Delete</a>
+                <a href="update-receipe/{{recepie.id}}/" class="btn btn-success">Update</a>
               </td>
             </tr>
             {% empty %}
-            <tr>
-              <td colspan="4">No recipes found.</td>
-            </tr>
+            <tr><td colspan="5">No recipes found.</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -79,17 +70,15 @@
   </div>
 </div>
 
-<!-- JavaScript for Show More / Less toggle -->
+<!-- JavaScript -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    const toggleButtons = document.querySelectorAll(".toggle-desc-btn");
-
-    toggleButtons.forEach((btn) => {
+    // Toggle Show More/Show Less
+    document.querySelectorAll(".toggle-desc-btn").forEach(btn => {
       btn.addEventListener("click", () => {
         const td = btn.closest("td");
         const shortDesc = td.querySelector(".short-desc");
         const fullDesc = td.querySelector(".full-desc");
-
         const isExpanded = !fullDesc.classList.contains("d-none");
 
         if (isExpanded) {
@@ -101,6 +90,62 @@
           shortDesc.classList.add("d-none");
           btn.textContent = "Show less";
         }
+      });
+    });
+
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const tableBody = document.querySelector("#recipeTable tbody");
+    const allRows = Array.from(tableBody.querySelectorAll("tr"));
+
+    function updateSerialNumbers() {
+      const visibleRows = tableBody.querySelectorAll("tr:not([style*='display: none'])");
+      visibleRows.forEach((row, index) => {
+        row.querySelector(".serial-number").textContent = index + 1;
+      });
+    }
+
+    function searchAndSort() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      if (!searchTerm) return;
+
+      const matchingRows = [];
+      allRows.forEach(row => {
+        const name = row.querySelector(".recipe-name").textContent.toLowerCase();
+        const id = parseInt(row.getAttribute("data-id"));
+
+        if (name.includes(searchTerm)) {
+          matchingRows.push({ row, name, id });
+        } else {
+          row.style.display = "none";
+        }
+      });
+
+      matchingRows.sort((a, b) => {
+        const aStarts = a.name.startsWith(searchTerm) ? 0 : 1;
+        const bStarts = b.name.startsWith(searchTerm) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return a.id - b.id;
+      });
+
+      tableBody.innerHTML = "";
+      matchingRows.forEach(({ row }, i) => {
+        row.style.display = "";
+        row.querySelector(".serial-number").textContent = i + 1;
+        tableBody.appendChild(row);
+      });
+    }
+
+    searchBtn.addEventListener("click", searchAndSort);
+
+    resetBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      tableBody.innerHTML = "";
+      allRows.forEach((row, i) => {
+        row.style.display = "";
+        row.querySelector(".serial-number").textContent = i + 1;
+        tableBody.appendChild(row);
       });
     });
   });
