@@ -1,7 +1,51 @@
-{% extends "base.html" %}
-{% block start %}
-<div class="d-flex justify-content-center align-items-center min-vh-100">
+{% extends "base.html" %} {% block start %}
 
+<!-- Page Styles -->
+<style>
+  body {
+    margin: 0;
+    overflow: hidden; /* Prevent scrolling */
+  }
+
+  .navbar {
+    background-color: #0c2f65 !important; /* Darker background */
+    padding: 0.75rem 2rem;
+    height: 70px;
+  }
+  .navbar form {
+    background-color: inherit !important;
+    padding: none !important;
+    border-radius: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .logout-btn:hover {
+    text-decoration: underline;
+  }
+
+  .main-content {
+    margin-top: 50px;
+  }
+</style>
+
+<!-- Navbar -->
+<nav
+  class="navbar navbar-expand-lg fixed-top d-flex justify-content-between align-items-center"
+>
+  <div class="text-white fw-bold">Welcome, {{ request.user.username }}</div>
+  <div>
+    <form method="post" class="mb-0">
+      {% csrf_token %}
+      <a href="/logout" class="btn btn-danger">Logout</a>
+    </form>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div
+  class="main-content d-flex justify-content-center align-items-center min-vh-100"
+>
   <!-- Left Side Buttons -->
   <div class="me-5 d-flex flex-column">
     <a href="/recepies_list" class="btn btn-outline-light">Open Receipes</a>
@@ -14,7 +58,7 @@
     enctype="multipart/form-data"
   >
     {% csrf_token %}
-    <h1 style="text-align: center">Receipe Form</h1>
+    <h1 class="text-center">Receipe Form</h1>
     <div class="mb-3">
       <label class="form-label">Recipe Name</label>
       <input
@@ -41,4 +85,5 @@
     <button type="submit" class="btn btn-primary w-100">Add Receipe</button>
   </form>
 </div>
+
 {% endblock %}

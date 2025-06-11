@@ -1,0 +1,62 @@
+{% extends "base.html" %} {% block start %}
+<div class="d-flex justify-content-center align-items-center vh-100">
+  <div class="p-4 rounded shadow" style="width: 450px">
+    <form method="post">
+      {% csrf_token %}
+      <h1 class="text-center">Login</h1>
+      <br />
+      {% if messages %} {{message.tag}}
+      <div class="alert alert-primary" role="alert">
+        {% for message in messages %} {{message}} {% endfor %}
+      </div>
+      {% endif %}
+      <div class="mb-3">
+        <label for="exampleInputEmail1" class="form-label">Email address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="exampleInputEmail1"
+          name="email"
+          required
+        />
+      </div>
+
+      <div class="mb-3 position-relative">
+        <label for="exampleInputPassword1" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control pe-5"
+          name="password"
+          id="exampleInputPassword1"
+          required
+        />
+        <i
+          class="fa-solid fa-eye position-absolute"
+          id="togglePassword"
+          style="top: 43px; right: 10px; cursor: pointer"
+        ></i>
+      </div>
+
+      <br />
+      <button type="submit" class="btn btn-primary w-100">Submit</button>
+
+      <div class="mt-3 text-center">
+        Create an Account! <a href="/register">Register</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  const passwordInput = document.getElementById("exampleInputPassword1");
+  const togglePassword = document.getElementById("togglePassword");
+
+  togglePassword.addEventListener("click", function () {
+    const type =
+      passwordInput.getAttribute("type") === "password" ? "text" : "password";
+    passwordInput.setAttribute("type", type);
+    this.classList.toggle("fa-eye");
+    this.classList.toggle("fa-eye-slash");
+  });
+</script>
+{% endblock %}

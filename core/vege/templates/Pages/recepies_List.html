@@ -1,16 +1,17 @@
-{% extends "base.html" %}
-{% block start %}
-<div class="container min-vh-100 d-flex align-items-center justify-content-center">
+{% extends "base.html" %} {% block start %}
+<div
+  class="container min-vh-100 d-flex align-items-center justify-content-center"
+>
   <div class="row w-100">
-
     <!-- Left Side Button -->
-    <div class="col-12 col-md-2 mb-3 d-flex align-items-center justify-content-center">
+    <div
+      class="col-12 col-md-2 mb-3 d-flex align-items-center justify-content-center"
+    >
       <a href="/" class="btn btn-outline-light">Add Recipe</a>
     </div>
 
     <!-- Centered Scrollable Table -->
     <div class="col-12 col-md-10">
-      
       <!-- Search + Reset -->
       <div class="mb-3 d-flex gap-2">
         <input
@@ -23,9 +24,21 @@
         <button id="resetBtn" class="btn btn-secondary">Reset</button>
       </div>
 
-      <div class="table-responsive" style="max-height: 500px; overflow-y: auto; background-color: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 1rem;">
+      <div
+        class="table-responsive"
+        style="
+          max-height: 500px;
+          overflow-y: auto;
+          background-color: rgba(255, 255, 255, 0.05);
+          padding: 1rem;
+          border-radius: 1rem;
+        "
+      >
         <h2 class="text-center mb-4">List of Recipes</h2>
-        <table class="table table-hover table-bordered table-dark align-middle text-center" id="recipeTable">
+        <table
+          class="table table-hover table-bordered table-dark align-middle text-center"
+          id="recipeTable"
+        >
           <thead class="table-light text-dark">
             <tr>
               <th>S No.</th>
@@ -41,10 +54,18 @@
               <td class="serial-number">{{ forloop.counter }}</td>
               <td class="recipe-name">{{ recepie.receipe_name }}</td>
               <td>
-                <span class="short-desc">{{ recepie.receipe_description|truncatechars:50 }}</span>
-                <span class="full-desc d-none">{{ recepie.receipe_description }}</span>
+                <span class="short-desc"
+                  >{{ recepie.receipe_description|truncatechars:50 }}</span
+                >
+                <span class="full-desc d-none"
+                  >{{ recepie.receipe_description }}</span
+                >
                 <br />
-                <button class="btn btn-sm btn-link text-light toggle-desc-btn p-0">Show more</button>
+                <button
+                  class="btn btn-sm btn-link text-light toggle-desc-btn p-0"
+                >
+                  Show more
+                </button>
               </td>
               <td>
                 <img
@@ -56,12 +77,18 @@
                 />
               </td>
               <td>
-                <a href="delete-receipe/{{recepie.id}}/" class="btn btn-danger">Delete</a>
-                <a href="update-receipe/{{recepie.id}}/" class="btn btn-success">Update</a>
+                <a href="delete-receipe/{{recepie.id}}/" class="btn btn-danger"
+                  >Delete</a
+                >
+                <a href="update-receipe/{{recepie.id}}/" class="btn btn-success"
+                  >Update</a
+                >
               </td>
             </tr>
             {% empty %}
-            <tr><td colspan="5">No recipes found.</td></tr>
+            <tr>
+              <td colspan="5">No recipes found.</td>
+            </tr>
             {% endfor %}
           </tbody>
         </table>
@@ -73,46 +100,21 @@
 <!-- JavaScript -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    // Toggle Show More/Show Less
-    document.querySelectorAll(".toggle-desc-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const td = btn.closest("td");
-        const shortDesc = td.querySelector(".short-desc");
-        const fullDesc = td.querySelector(".full-desc");
-        const isExpanded = !fullDesc.classList.contains("d-none");
-
-        if (isExpanded) {
-          fullDesc.classList.add("d-none");
-          shortDesc.classList.remove("d-none");
-          btn.textContent = "Show more";
-        } else {
-          fullDesc.classList.remove("d-none");
-          shortDesc.classList.add("d-none");
-          btn.textContent = "Show less";
-        }
-      });
-    });
-
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
     const resetBtn = document.getElementById("resetBtn");
-    const tableBody = document.querySelector("#recipeTable tbody");
+    const tableBody = document.querySelector("tbody");
     const allRows = Array.from(tableBody.querySelectorAll("tr"));
-
-    function updateSerialNumbers() {
-      const visibleRows = tableBody.querySelectorAll("tr:not([style*='display: none'])");
-      visibleRows.forEach((row, index) => {
-        row.querySelector(".serial-number").textContent = index + 1;
-      });
-    }
 
     function searchAndSort() {
       const searchTerm = searchInput.value.trim().toLowerCase();
       if (!searchTerm) return;
 
       const matchingRows = [];
-      allRows.forEach(row => {
-        const name = row.querySelector(".recipe-name").textContent.toLowerCase();
+      allRows.forEach((row) => {
+        const name = row
+          .querySelector(".recipe-name")
+          .textContent.toLowerCase();
         const id = parseInt(row.getAttribute("data-id"));
 
         if (name.includes(searchTerm)) {
@@ -137,7 +139,15 @@
       });
     }
 
+    // 👇 KEY FIX
     searchBtn.addEventListener("click", searchAndSort);
+
+    searchInput.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        searchBtn.click();
+      }
+    });
 
     resetBtn.addEventListener("click", () => {
       searchInput.value = "";
